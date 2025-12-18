@@ -101,16 +101,6 @@ For example, you can perform an editable installation as follows:
     pip install --requirement=examples/requirements.in
     ```
 
-    For Qwen model support, install with:
-    ```shell
-    pip install .[qwen]
-    ```
-
-    For DeepSeek model support, install with:
-    ```shell
-    pip install .[deepseek]
-    ```
-
     Note that at this stage you may find that your development environment is
     not supported by some underlying dependencies and you will need to do some
     dependency management.
@@ -123,10 +113,6 @@ select. Some are better at role-playing than others. You must also provide a
 text embedder for the associative memory. Any fixed-dimensional embedding works
 for this. Ideally it would be one that works well for sentence similarity or
 semantic search.
-
-Concordia now supports Qwen models via DashScope API and DeepSeek models via DeepSeek API.
-See `examples/qwen_tutorial.ipynb` and `examples/deepseek_tutorial.ipynb` for detailed examples
-on how to use these models with Concordia.
 
 ## Example usage
 
@@ -143,7 +129,7 @@ answering three key questions:
 
 The agents used in the following example implement exactly these questions:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/google-deepmind/concordia/blob/main/examples/deepseek_tutorial.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.sandbox.google.com/github/google-deepmind/concordia/blob/main/examples/tutorial.ipynb)
 
 ## Citing Concordia
 
