@@ -82,6 +82,10 @@ setuptools.setup(
             # Used in contrib.language_models.amazon
             'boto3',
         ],
+        'deepseek': [
+            # Used in concordia.contrib.language_models.deepseek
+            'openai>=1.3.0',
+        ],
         'dev': [
             # Used in development
             'build',
@@ -119,6 +123,10 @@ setuptools.setup(
         ],
         'openai': [
             # Used in concordia.contrib.language_models.openai
+            'openai>=1.3.0',
+        ],
+        'qwen': [
+            # Used in concordia.contrib.language_models.qwen
             'openai>=1.3.0',
         ],
         'together': [

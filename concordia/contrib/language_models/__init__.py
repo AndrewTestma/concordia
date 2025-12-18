@@ -23,6 +23,7 @@ from concordia.language_model import no_language_model
 
 _REGISTRY = types.MappingProxyType({
     'amazon_bedrock': 'amazon.amazon_bedrock_model.AmazonBedrockLanguageModel',
+    'deepseek': 'deepseek.deepseek_model.DeepSeekLanguageModel',
     'google_aistudio_model': (
         'google.google_aistudio_model.GoogleAIStudioLanguageModel'
     ),
@@ -37,6 +38,7 @@ _REGISTRY = types.MappingProxyType({
     'pytorch_gemma': (
         'huggingface.pytorch_gemma_model.PyTorchGemmaLanguageModel'
     ),
+    'qwen': 'qwen.qwen_model.QwenLanguageModel',
     'together_ai': 'together.together_ai.Base',
     'vllm': 'vllm.vllm_model.VLLMLanguageModel',
 })
