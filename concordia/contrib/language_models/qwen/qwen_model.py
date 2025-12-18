@@ -15,6 +15,7 @@
 """Language Model that uses Qwen models via DashScope API."""
 
 import os
+from collections.abc import Collection
 from typing import override
 
 from concordia.language_model import language_model
@@ -53,7 +54,7 @@ class QwenLanguageModel(language_model.LanguageModel):
     self._model_name = model_name
     self._measurements = measurements
     self._channel = channel
-    
+
     # Create OpenAI client configured for DashScope
     self._client = OpenAI(
         api_key=self._api_key,
@@ -66,7 +67,7 @@ class QwenLanguageModel(language_model.LanguageModel):
       prompt: str,
       *,
       max_tokens: int = language_model.DEFAULT_MAX_TOKENS,
-      terminators: language_model.Terminators = language_model.DEFAULT_TERMINATORS,
+      terminators: Collection[str] = language_model.DEFAULT_TERMINATORS,
       temperature: float = language_model.DEFAULT_TEMPERATURE,
       timeout: float = language_model.DEFAULT_TIMEOUT_SECONDS,
       seed: int | None = None,
@@ -81,7 +82,7 @@ class QwenLanguageModel(language_model.LanguageModel):
 
     # Prepare the messages
     messages = [{'role': 'user', 'content': prompt}]
-    
+
     # Make the API call
     response = self._client.chat.completions.create(
         model=self._model_name,
@@ -92,7 +93,7 @@ class QwenLanguageModel(language_model.LanguageModel):
         stream=False,
         seed=seed,
     )
-    
+
     # Extract and return the response text
     return response.choices[0].message.content
 
@@ -113,7 +114,7 @@ class QwenLanguageModel(language_model.LanguageModel):
         f'{chr(10).join([f"{i+1}. {response}" for i, response in enumerate(responses)])}\n\n'
         f'Respond ONLY with the number of the best option (1-{len(responses)}):'
     )
-    
+
     # Sample text from the model
     response_text = self.sample_text(
         formatted_prompt,
@@ -121,7 +122,7 @@ class QwenLanguageModel(language_model.LanguageModel):
         temperature=0.0,  # Use low temperature for consistent choice selection
         seed=seed,
     )
-    
+
     # Try to extract the selected index
     try:
       # Extract the first number from the response
@@ -134,7 +135,7 @@ class QwenLanguageModel(language_model.LanguageModel):
           return selected_index, responses[selected_index], {}
     except (ValueError, IndexError):
       pass
-    
+
     # If parsing fails, return a random choice
     import random
     selected_index = random.randrange(len(responses))
