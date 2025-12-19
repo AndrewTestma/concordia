@@ -112,7 +112,8 @@ def create_debate_config():
             params={
                 "name": "辩论主持人",
                 "next_game_master_name": "辩论主持人",
-                "turn_taking": "u-go-i-go",  # 轮流发言
+                "acting_order": "fixed",
+                "can_terminate_simulation": False,
             },
         )
     )
