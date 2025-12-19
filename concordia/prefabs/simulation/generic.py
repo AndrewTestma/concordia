@@ -273,7 +273,7 @@ class Simulation(simulation_lib.Simulation):
         entities=self.entities,
         premise=premise,
         max_steps=max_steps,
-        verbose=False,
+        verbose=True,
         log=raw_log,
         checkpoint_callback=checkpoint_callback,
     )
