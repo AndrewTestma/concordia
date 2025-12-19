@@ -269,19 +269,20 @@ class DebateAdvocate(prefab_lib.Prefab):
 
         # 创建组件
         memory = agent_components.memory.AssociativeMemory(memory_bank=memory_bank)
-        instructions = agent_components.instructions.Instructions(
-            agent_name=name,
-            instructions=(
-                f"您正在参加一场正式辩论。"
-                f"立场：{position}；主题：{debate_topic}。"
-                f"必须采用针锋相对的辩论风格："
-                f"1) 直接针对对方上一轮的关键论点进行反驳，指出漏洞、矛盾或证据不足；"
-                f"2) 给出清晰的主张（Claim）、证据（Evidence）与推理（Warrant），避免空泛表态；"
-                f"3) 使用数据或权威来源（若无真实数据可概念性引用）来支撑论点；"
-                f"4) 适当使用反问与比较来削弱对方论证；"
-                f"5) 保持专业，但避免过度礼貌与妥协性措辞。"
-                f"输出格式严格为：{name} -- \"您的论点内容\""
-            )
+        instructions_text = (
+            f"您正在参加一场正式辩论。"
+            f"立场：{position}；主题：{debate_topic}。"
+            f"必须采用针锋相对的辩论风格："
+            f"1) 直接针对对方上一轮的关键论点进行反驳，指出漏洞、矛盾或证据不足；"
+            f"2) 给出清晰的主张（Claim）、证据（Evidence）与推理（Warrant），避免空泛表态；"
+            f"3) 使用数据或权威来源（若无真实数据可概念性引用）来支撑论点；"
+            f"4) 适当使用反问与比较来削弱对方论证；"
+            f"5) 保持专业，但避免过度礼貌与妥协性措辞。"
+            f"输出格式严格为：{name} -- \"您的论点内容\""
+        )
+        instructions = agent_components.constant.Constant(
+            state=instructions_text,
+            pre_act_label=agent_components.instructions.DEFAULT_INSTRUCTIONS_PRE_ACT_LABEL,
         )
         observation = agent_components.observation.LastNObservations(history_length=50)
 
