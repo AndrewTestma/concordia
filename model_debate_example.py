@@ -106,7 +106,7 @@ def create_debate_config():
 
     # 创建配置
     config = prefab_lib.Config(
-        default_premise="两个AI模型正在就'应对气候变化更好的解决方案是可再生能源还是核能？'这一话题进行正式辩论。辩论将包括开场陈述、反驳和结语。",
+        default_premise="两个AI模型正在就'应对气候变化更好的解决方案是可再生能源还是核能？'这一话题进行正式辩论。辩论将包括开场陈述、反驳和结语。每个参与者需要按照{name} -- \"内容\"的格式进行发言。",
         default_max_steps=12,  # 限制最大步数以控制辩论长度
         prefabs=prefabs,
         instances=instances,
@@ -216,6 +216,7 @@ class DebateAdvocate(prefab_lib.Prefab):
                 f"主题：{self.debate_topic}。"
                 f"请具有说服力、逻辑性和尊重性。"
                 f"用事实和例子支持您的论点。"
+                f"请严格按照以下格式回复：{name} -- \"您的论点内容\""
             )
         )
         observation = agent_components.observation.LastNObservations(history_length=50)
@@ -286,7 +287,7 @@ def create_advanced_debate_config():
 
     # 创建配置
     config = prefab_lib.Config(
-        default_premise="两位专家辩手正在正式辩论比赛中陈述他们的论点。主题是：'应对气候变化更好的解决方案是可再生能源还是核能？'每方将进行开场陈述、反驳并以结语结束。",
+        default_premise="两位专家辩手正在正式辩论比赛中陈述他们的论点。主题是：'应对气候变化更好的解决方案是可再生能源还是核能？'每方将进行开场陈述、反驳并以结语结束。每个参与者需要按照{name} -- \"内容\"的格式进行发言。",
         default_max_steps=15,
         prefabs=prefabs,
         instances=instances,
