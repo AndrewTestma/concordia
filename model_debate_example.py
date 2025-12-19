@@ -13,6 +13,8 @@ import numpy as np
 import sentence_transformers
 from concordia.environment.engines import sequential
 
+MODEL_REGISTRY = {"qwen": None, "deepseek": None}
+
 def _parse_event_summary(summary: str):
     import re
     if '---' not in summary:
@@ -54,6 +56,8 @@ def setup_models():
             api_key=deepseek_api_key,
         )
 
+    MODEL_REGISTRY["qwen"] = qwen_model
+    MODEL_REGISTRY["deepseek"] = deepseek_model
     return qwen_model, deepseek_model
 
 # 2. 设置嵌入器
@@ -93,7 +97,8 @@ def create_debate_config():
                 "position": "pro",
                 "debate_topic": "可再生能源优于核能来应对气候变化",
                 "goal": "用数据和事实支持可再生能源优先",
-                "traits": "强势、逻辑严密、直击对方弱点"
+                "traits": "强势、逻辑严密、直击对方弱点",
+                "model_key": "qwen"
             },
         ),
         # 反方辩手（使用自定义代理，明确立场与风格）
@@ -105,7 +110,8 @@ def create_debate_config():
                 "position": "con",
                 "debate_topic": "核能优于可再生能源来应对气候变化",
                 "goal": "强调稳定、低碳与可扩展性",
-                "traits": "果断、批判性强、善于指出逻辑漏洞"
+                "traits": "果断、批判性强、善于指出逻辑漏洞",
+                "model_key": "deepseek"
             },
         ),
     ]
@@ -156,6 +162,8 @@ def run_debate():
             call_to_next_action_spec=(
                 "根据以上上下文，请生成{name} -- \"...\" 的中文发言内容，"
                 "要求符合当前阶段：开场陈述→反驳→结语，且必须使用该格式。"
+                "严格遵循该辩手的既定立场，不得为对方立场辩护；"
+                "必须针对上一位发言的关键论点逐条反驳，并以主张-证据-推理结构组织。"
             ),
             call_to_resolve="请将上一位发言者的句子作为事件写入日志。",
             call_to_check_termination="辩论是否已完成？",
@@ -266,18 +274,27 @@ class DebateAdvocate(prefab_lib.Prefab):
         name = self.params.get("name", "Debater")
         position = self.params.get("position", "pro")
         debate_topic = self.params.get("debate_topic", "")
+        goal = self.params.get("goal", "")
+        traits = self.params.get("traits", "")
+        model_key = self.params.get("model_key", None)
+
+        stance_text = "主张可再生能源优于核能" if str(position).lower() == "pro" else "主张核能优于可再生能源"
 
         # 创建组件
         memory = agent_components.memory.AssociativeMemory(memory_bank=memory_bank)
         instructions_text = (
             f"您正在参加一场正式辩论。"
-            f"立场：{position}；主题：{debate_topic}。"
+            f"主题：{debate_topic}。"
+            f"您的既定立场为：{stance_text}。"
+            f"目标：{goal}。风格：{traits}。"
             f"必须采用针锋相对的辩论风格："
             f"1) 直接针对对方上一轮的关键论点进行反驳，指出漏洞、矛盾或证据不足；"
             f"2) 给出清晰的主张（Claim）、证据（Evidence）与推理（Warrant），避免空泛表态；"
             f"3) 使用数据或权威来源（若无真实数据可概念性引用）来支撑论点；"
             f"4) 适当使用反问与比较来削弱对方论证；"
             f"5) 保持专业，但避免过度礼貌与妥协性措辞。"
+            f"务必维护本方主张，不得为对方立场辩护；"
+            f"若上一轮为对方发言，请引用其关键句并逐条反驳。"
             f"输出格式严格为：{name} -- \"您的论点内容\""
         )
         instructions = agent_components.constant.Constant(
@@ -286,7 +303,7 @@ class DebateAdvocate(prefab_lib.Prefab):
         )
         observation = agent_components.observation.LastNObservations(history_length=100)
         similar_memories = agent_components.all_similar_memories.AllSimilarMemories(
-            model=model,
+            model=MODEL_REGISTRY.get(model_key) if model_key and MODEL_REGISTRY.get(model_key) else model,
             memory_component_key=agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
             num_memories_to_retrieve=10,
         )
@@ -299,7 +316,7 @@ class DebateAdvocate(prefab_lib.Prefab):
         }
 
         act_component = agent_components.concat_act_component.ConcatActComponent(
-            model=model,
+            model=MODEL_REGISTRY.get(model_key) if model_key and MODEL_REGISTRY.get(model_key) else model,
             component_order=[
                 agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
                 agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY,
