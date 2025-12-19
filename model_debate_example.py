@@ -97,8 +97,8 @@ def create_debate_config():
             prefab="dialogic__GameMaster",
             role=prefab_lib.Role.GAME_MASTER,
             params={
-                "name": "debate moderator",
-                "next_game_master_name": "debate moderator",
+                "name": "辩论主持人",
+                "next_game_master_name": "辩论主持人",
                 "turn_taking": "u-go-i-go",  # 轮流发言
             },
         )
@@ -217,6 +217,8 @@ class DebateAdvocate(prefab_lib.Prefab):
                 f"请具有说服力、逻辑性和尊重性。"
                 f"用事实和例子支持您的论点。"
                 f"请严格按照以下格式回复：{name} -- \"您的论点内容\""
+                f"请注意倾听对方的观点并进行有针对性的反驳。"
+                f"保持专业和礼貌的态度。"
             )
         )
         observation = agent_components.observation.LastNObservations(history_length=50)
@@ -279,8 +281,8 @@ def create_advanced_debate_config():
             prefab="dialogic__GameMaster",
             role=prefab_lib.Role.GAME_MASTER,
             params={
-                "name": "debate moderator",
-                "next_game_master_name": "debate moderator",
+                "name": "辩论主持人",
+                "next_game_master_name": "辩论主持人",
             },
         )
     )
