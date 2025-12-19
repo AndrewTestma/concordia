@@ -133,7 +133,6 @@ def run_debate():
     try:
         # 创建自定义引擎以提供更明确的辩论流程提示
         custom_engine = sequential.Sequential(
-            call_to_make_observation="请用中文简要说明当前辩论阶段，并为{name}准备发言素材。",
             call_to_next_acting="请在参与者中选择下一位发言者的姓名。",
             call_to_next_action_spec=(
                 "根据以上上下文，请生成{name} -- \"...\" 的中文发言内容，"
