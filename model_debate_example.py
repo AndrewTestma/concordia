@@ -124,7 +124,7 @@ def create_debate_config():
             params={
                 "name": "辩论主持人",
                 "next_game_master_name": "辩论主持人",
-                "acting_order": "fixed",
+                "acting_order": "random",
                 "can_terminate_simulation": False,
             },
         )
@@ -158,10 +158,12 @@ def run_debate():
     try:
         # 创建自定义引擎以提供更明确的辩论流程提示
         custom_engine = sequential.Sequential(
-            call_to_next_acting="请在参与者中选择下一位发言者的姓名。",
+            call_to_next_acting="请在参与者中随机选择下一位发言者的姓名。若上一位发言者与当前选择相同，请改为另一位，以保证轮次交替。",
             call_to_next_action_spec=(
                 "根据以上上下文，请生成{name} -- \"...\" 的中文发言内容，"
                 "要求符合当前阶段：开场陈述→反驳→结语，且必须使用该格式。"
+                "若当前轮次无上一位发言者（首轮），请给出开场陈述，避免出现‘您刚才’等引用措辞；"
+                "若存在上一位发言者，请先引用其关键一句（加入前缀：引用：\"...\"），随后进行针锋相对的反驳；"
                 "严格遵循该辩手的既定立场，不得为对方立场辩护；"
                 "必须针对上一位发言的关键论点逐条反驳，并以主张-证据-推理结构组织。"
             ),
@@ -294,7 +296,8 @@ class DebateAdvocate(prefab_lib.Prefab):
             f"4) 适当使用反问与比较来削弱对方论证；"
             f"5) 保持专业，但避免过度礼貌与妥协性措辞。"
             f"务必维护本方主张，不得为对方立场辩护；"
-            f"若上一轮为对方发言，请引用其关键句并逐条反驳。"
+            f"若无上一轮发言（首轮），请进行开场陈述且不得出现‘您刚才’或类似引用措辞；"
+            f"若上一轮为对方发言，请先以“引用：\"...\"”准确摘取其关键一句，再逐条反驳。"
             f"输出格式严格为：{name} -- \"您的论点内容\""
         )
         instructions = agent_components.constant.Constant(
