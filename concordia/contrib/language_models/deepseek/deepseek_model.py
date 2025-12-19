@@ -71,6 +71,8 @@ class DeepSeekLanguageModel(language_model.LanguageModel):
       temperature: float = language_model.DEFAULT_TEMPERATURE,
       timeout: float = language_model.DEFAULT_TIMEOUT_SECONDS,
       seed: int | None = None,
+      top_p: float = language_model.DEFAULT_TOP_P,
+      top_k: int = language_model.DEFAULT_TOP_K,
   ) -> str:
     """Samples text from the language model."""
     # Log the API call for measurement purposes
@@ -92,6 +94,7 @@ class DeepSeekLanguageModel(language_model.LanguageModel):
         stop=terminators,
         stream=False,
         seed=seed,
+        top_p=top_p,
     )
 
     # Extract and return the response text
