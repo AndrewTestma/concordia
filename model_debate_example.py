@@ -13,6 +13,18 @@ import numpy as np
 import sentence_transformers
 from concordia.environment.engines import sequential
 
+def _parse_event_summary(summary: str):
+    import re
+    if '---' not in summary:
+        return None, None
+    event_part = summary.split('---', 1)[1].strip()
+    if event_part.startswith('Event:'):
+        event_part = event_part[len('Event:'):].strip()
+    m = re.match(r'^(.*?)\s*--\s*"(.*)"', event_part)
+    if not m:
+        return None, None
+    return m.group(1).strip(), m.group(2).strip()
+
 # 1. 设置语言模型
 # 使用不同的模型进行辩论
 def setup_models():
@@ -151,17 +163,26 @@ def run_debate():
         )
 
         print("开始辩论...")
-        results = sim.play()
+        results = sim.play(return_html_log=False)
 
         print("\n=== 辩论结果 ===")
         print("辩论成功完成！")
-        print(f"总步数: {len(results.steps)}")
+        print(f"总步数: {len(results) if isinstance(results, list) else '未知'}")
 
         # 打印一些关键结果
-        if hasattr(results, 'logs'):
-            print("\n=== 辩论日志 ===")
-            for i, step in enumerate(results.steps[:5]):  # 只打印前5步
-                print(f"步骤 {i+1}: {step}")
+        if isinstance(results, list) and results:
+            print("\n=== 辩论日志（前5步摘要） ===")
+            for i, entry in enumerate(results[:5]):
+                summary = entry.get('Summary', f'Step {i+1}')
+                print(summary)
+            print("\n=== 友好输出（前5轮） ===")
+            for i, entry in enumerate(results[:5]):
+                summary = entry.get('Summary', '')
+                speaker, content = _parse_event_summary(summary)
+                if speaker and content:
+                    print(f"第 {i+1} 轮: {speaker}：{content}")
+                else:
+                    print(f"第 {i+1} 轮: {summary}")
 
         return results
 
@@ -173,7 +194,7 @@ def run_debate():
 # 5. 分析辩论结果
 def analyze_debate_results(results):
     """分析辩论的结果。"""
-    if results is None:
+    if results is None or not isinstance(results, list):
         print("没有结果可供分析。")
         return
 
@@ -181,10 +202,11 @@ def analyze_debate_results(results):
 
     # 统计每个参与者的发言次数
     participant_turns = {}
-    if hasattr(results, 'steps'):
-        for step in results.steps:
-            # 这里需要根据实际结果格式进行调整
-            pass
+    for entry in results:
+        summary = entry.get('Summary', '')
+        speaker, content = _parse_event_summary(summary)
+        if speaker:
+            participant_turns[speaker] = participant_turns.get(speaker, 0) + 1
 
     print("辩论分析完成。")
 
