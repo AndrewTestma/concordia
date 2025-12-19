@@ -284,17 +284,27 @@ class DebateAdvocate(prefab_lib.Prefab):
             state=instructions_text,
             pre_act_label=agent_components.instructions.DEFAULT_INSTRUCTIONS_PRE_ACT_LABEL,
         )
-        observation = agent_components.observation.LastNObservations(history_length=50)
+        observation = agent_components.observation.LastNObservations(history_length=100)
+        similar_memories = agent_components.all_similar_memories.AllSimilarMemories(
+            memory_component_key=agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
+            num_memories_to_retrieve=10,
+        )
 
         components = {
             agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY: memory,
             "Instructions": instructions,
             agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY: observation,
+            "SimilarMemories": similar_memories,
         }
 
         act_component = agent_components.concat_act_component.ConcatActComponent(
             model=model,
-            component_order=list(components.keys()),
+            component_order=[
+                agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
+                agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY,
+                "SimilarMemories",
+                "Instructions",
+            ],
         )
 
         return entity_agent_with_logging.EntityAgentWithLogging(
