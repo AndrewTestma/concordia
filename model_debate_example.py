@@ -286,6 +286,7 @@ class DebateAdvocate(prefab_lib.Prefab):
         )
         observation = agent_components.observation.LastNObservations(history_length=100)
         similar_memories = agent_components.all_similar_memories.AllSimilarMemories(
+            model=model,
             memory_component_key=agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
             num_memories_to_retrieve=10,
         )
