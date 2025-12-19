@@ -118,17 +118,17 @@ def create_debate_config():
 def run_debate():
     """运行两个模型之间的辩论模拟。"""
 
-    print("Setting up models and embedder...")
+    print("正在设置模型和嵌入器...")
     qwen_model, deepseek_model = setup_models()
     embedder = setup_embedder()
 
-    print("Creating debate configuration...")
+    print("正在创建辩论配置...")
     config = create_debate_config()
 
     # 由于我们需要两个不同的模型，我们需要创建两个独立的模拟
     # 这是一个简化版本，实际实现可能需要更复杂的设置
 
-    print("Initializing simulation...")
+    print("正在初始化模拟...")
     try:
         # 创建模拟（使用第一个模型作为主要模型）
         sim = simulation.Simulation(
@@ -137,23 +137,23 @@ def run_debate():
             embedder=embedder
         )
 
-        print("Starting debate...")
+        print("开始辩论...")
         results = sim.play()
 
-        print("\n=== DEBATE RESULTS ===")
-        print("Debate completed successfully!")
-        print(f"Total steps: {len(results.steps)}")
+        print("\n=== 辩论结果 ===")
+        print("辩论成功完成！")
+        print(f"总步数: {len(results.steps)}")
 
         # 打印一些关键结果
         if hasattr(results, 'logs'):
-            print("\n=== DEBATE LOGS ===")
+            print("\n=== 辩论日志 ===")
             for i, step in enumerate(results.steps[:5]):  # 只打印前5步
-                print(f"Step {i+1}: {step}")
+                print(f"步骤 {i+1}: {step}")
 
         return results
 
     except Exception as e:
-        print(f"Error during debate: {e}")
+        print(f"辩论过程中出现错误: {e}")
         # 返回模拟结果即使出错
         return None
 
@@ -161,10 +161,10 @@ def run_debate():
 def analyze_debate_results(results):
     """分析辩论的结果。"""
     if results is None:
-        print("No results to analyze.")
+        print("没有结果可供分析。")
         return
 
-    print("\n=== DEBATE ANALYSIS ===")
+    print("\n=== 辩论分析 ===")
 
     # 统计每个参与者的发言次数
     participant_turns = {}
@@ -173,12 +173,12 @@ def analyze_debate_results(results):
             # 这里需要根据实际结果格式进行调整
             pass
 
-    print("Debate analysis complete.")
+    print("辩论分析完成。")
 
 # 6. 主函数
 def main():
     """运行辩论示例的主函数。"""
-    print("AI模型辩论示例")
+    print("AI模型中文辩论示例")
     print("=" * 30)
 
     # 运行辩论
@@ -187,11 +187,12 @@ def main():
     # 分析结果
     analyze_debate_results(results)
 
-    print("\nDebate example completed!")
+    print("\n辩论示例完成！")
 
 # 高级用法：自定义辩论代理
 class DebateAdvocate(prefab_lib.Prefab):
     """具有特定推理模式的辩论倡导者的自定义预制件。"""
+    description = "一个用于正式辩论的自定义代理，可以根据指定的立场和主题进行辩论。"
 
     def __init__(self, position="pro", debate_topic="", **kwargs):
         super().__init__(**kwargs)
