@@ -12,6 +12,10 @@ from concordia.contrib import language_models as language_model_utils
 import numpy as np
 import sentence_transformers
 from concordia.environment.engines import sequential
+import dataclasses
+from concordia.language_model import language_model
+from concordia.associative_memory import basic_associative_memory
+from concordia.agents import entity_agent_with_logging
 
 def _parse_event_summary(summary: str):
     import re
@@ -249,16 +253,18 @@ def main():
     print("\n辩论示例完成！")
 
 # 高级用法：自定义辩论代理
+@dataclasses.dataclass
 class DebateAdvocate(prefab_lib.Prefab):
     """具有特定推理模式的辩论倡导者的自定义预制件。"""
-    description = "一个用于正式辩论的自定义代理，可以根据指定的立场和主题进行辩论。"
+    description: str = "一个用于正式辩论的自定义代理，可以根据指定的立场和主题进行辩论。"
+    position: str = "pro"
+    debate_topic: str = ""
 
-    def __init__(self, position="pro", debate_topic="", **kwargs):
-        super().__init__(**kwargs)
-        self.position = position
-        self.debate_topic = debate_topic
-
-    def build(self, model, memory_bank):
+    def build(
+        self,
+        model: language_model.LanguageModel,
+        memory_bank: basic_associative_memory.AssociativeMemoryBank,
+    ) -> entity_agent_with_logging.EntityAgentWithLogging:
         """构建自定义辩论代理。"""
         from concordia.agents import entity_agent_with_logging
         from concordia.components import agent as agent_components
