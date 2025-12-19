@@ -11,6 +11,7 @@ from concordia.utils import helper_functions
 from concordia.contrib import language_models as language_model_utils
 import numpy as np
 import sentence_transformers
+from concordia.environment.engines import sequential
 
 # 1. 设置语言模型
 # 使用不同的模型进行辩论
@@ -130,11 +131,24 @@ def run_debate():
 
     print("正在初始化模拟...")
     try:
+        # 创建自定义引擎以提供更明确的辩论流程提示
+        custom_engine = sequential.Sequential(
+            call_to_make_observation="请用中文简要说明当前辩论阶段，并为{name}准备发言素材。",
+            call_to_next_acting="请在参与者中选择下一位发言者的姓名。",
+            call_to_next_action_spec=(
+                "根据以上上下文，请生成{name} -- \"...\" 的中文发言内容，"
+                "要求符合当前阶段：开场陈述→反驳→结语，且必须使用该格式。"
+            ),
+            call_to_resolve="请将上一位发言者的句子作为事件写入日志。",
+            call_to_check_termination="辩论是否已完成？",
+            call_to_next_game_master="请选择下一位主持人。",
+        )
         # 创建模拟（使用第一个模型作为主要模型）
         sim = simulation.Simulation(
             config=config,
             model=qwen_model,  # 主要模型
-            embedder=embedder
+            embedder=embedder,
+            engine=custom_engine,
         )
 
         print("开始辩论...")
