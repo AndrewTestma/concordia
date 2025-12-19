@@ -79,27 +79,33 @@ def create_debate_config():
         **helper_functions.get_package_classes(entity_prefabs),
         **helper_functions.get_package_classes(game_master_prefabs),
     }
+    # 注册自定义辩论代理
+    prefabs["debate_advocate__Entity"] = DebateAdvocate
 
     # 定义辩论者实例
     instances = [
-        # Qwen模型作为正方辩手
+        # 正方辩手（使用自定义代理，明确立场与风格）
         prefab_lib.InstanceConfig(
-            prefab="basic__Entity",
+            prefab="debate_advocate__Entity",
             role=prefab_lib.Role.ENTITY,
             params={
                 "name": "Qwen支持者",
-                "goal": "论证可再生能源是应对气候变化的主要解决方案",
-                "traits": "分析性强、数据驱动、环保意识强"
+                "position": "pro",
+                "debate_topic": "可再生能源优于核能来应对气候变化",
+                "goal": "用数据和事实支持可再生能源优先",
+                "traits": "强势、逻辑严密、直击对方弱点"
             },
         ),
-        # DeepSeek模型作为反方辩手
+        # 反方辩手（使用自定义代理，明确立场与风格）
         prefab_lib.InstanceConfig(
-            prefab="basic__Entity",
+            prefab="debate_advocate__Entity",
             role=prefab_lib.Role.ENTITY,
             params={
                 "name": "DeepSeek质疑者",
-                "goal": "论证核能比可再生能源更能有效解决气候变化问题",
-                "traits": "务实、技术导向、注重成本"
+                "position": "con",
+                "debate_topic": "核能优于可再生能源来应对气候变化",
+                "goal": "强调稳定、低碳与可扩展性",
+                "traits": "果断、批判性强、善于指出逻辑漏洞"
             },
         ),
     ]
@@ -164,7 +170,24 @@ def run_debate():
         )
 
         print("开始辩论...")
-        results = sim.play(return_html_log=False)
+        # 流式输出：通过状态回调在每步结束时打印当轮事件
+        def _stream_callback(state: dict):
+            raw_log = state.get("raw_log", [])
+            if not raw_log:
+                return
+            entry = raw_log[-1]
+            summary = entry.get("Summary", "")
+            speaker, content = _parse_event_summary(summary)
+            if speaker and content:
+                print(f"[流式] {speaker}：{content}")
+            elif summary:
+                print(f"[流式] {summary}")
+
+        results = sim.play(
+            return_html_log=False,
+            get_state_callback=_stream_callback,
+            checkpoint_path=None,
+        )
 
         print("\n=== 辩论结果 ===")
         print("辩论成功完成！")
@@ -248,13 +271,14 @@ class DebateAdvocate(prefab_lib.Prefab):
             agent_name=name,
             instructions=(
                 f"您正在参加一场正式辩论。"
-                f"您的立场：{self.position}。"
-                f"主题：{self.debate_topic}。"
-                f"请具有说服力、逻辑性和尊重性。"
-                f"用事实和例子支持您的论点。"
-                f"请严格按照以下格式回复：{name} -- \"您的论点内容\""
-                f"请注意倾听对方的观点并进行有针对性的反驳。"
-                f"保持专业和礼貌的态度。"
+                f"立场：{self.position}；主题：{self.debate_topic}。"
+                f"必须采用针锋相对的辩论风格："
+                f"1) 直接针对对方上一轮的关键论点进行反驳，指出漏洞、矛盾或证据不足；"
+                f"2) 给出清晰的主张（Claim）、证据（Evidence）与推理（Warrant），避免空泛表态；"
+                f"3) 使用数据或权威来源（若无真实数据可概念性引用）来支撑论点；"
+                f"4) 适当使用反问与比较来削弱对方论证；"
+                f"5) 保持专业，但避免过度礼貌与妥协性措辞。"
+                f"输出格式严格为：{name} -- \"您的论点内容\""
             )
         )
         observation = agent_components.observation.LastNObservations(history_length=50)
