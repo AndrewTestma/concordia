@@ -1,3 +1,8 @@
+# 两个模型对话辩论示例
+
+这个示例展示了如何使用Concordia框架让两个不同的AI模型进行辩论。
+
+```python
 """
 使用Concordia框架实现两个AI模型中文辩论的示例。
 """
@@ -295,3 +300,50 @@ def create_advanced_debate_config():
 
 if __name__ == "__main__":
     main()
+```
+
+## 使用说明
+
+### 1. 环境设置
+
+在运行此示例之前，请确保设置了必要的环境变量：
+
+```bash
+# 设置Qwen API密钥
+export DASHSCOPE_API_KEY=your_qwen_api_key_here
+
+# 设置DeepSeek API密钥
+export DEEPSEEK_API_KEY=your_deepseek_api_key_here
+```
+
+### 2. 安装依赖
+
+```bash
+pip install gdm-concordia[qwen,deepseek]
+pip install sentence-transformers
+```
+
+### 3. 运行示例
+
+```bash
+python model_debate_example.py
+```
+
+## 示例特点
+
+1. **双模型中文辩论**：使用Qwen和DeepSeek两个不同的模型作为辩论双方，进行中文辩论
+2. **角色定制**：为每个模型分配了明确的角色和立场
+3. **结构化流程**：包含开场陈述、反驳和结语等辩论环节
+4. **可扩展性**：提供了自定义代理类以支持更复杂的辩论逻辑
+5. **结果分析**：包含基本的结果分析功能
+
+## 自定义扩展
+
+您可以轻松修改此示例以适应不同的辩论主题：
+
+1. 更改`default_premise`中的辩论主题
+2. 修改代理的`goal`和`traits`参数
+3. 调整`default_max_steps`控制辩论长度
+4. 使用自定义代理类添加特定的推理模式
+
+这个示例展示了Concordia框架的强大功能，可以用于研究不同AI模型的中文观点表达、论证能力和交互行为。
