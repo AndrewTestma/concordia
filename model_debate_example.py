@@ -12,10 +12,6 @@ from concordia.contrib import language_models as language_model_utils
 import numpy as np
 import sentence_transformers
 from concordia.environment.engines import sequential
-import dataclasses
-from concordia.language_model import language_model
-from concordia.associative_memory import basic_associative_memory
-from concordia.agents import entity_agent_with_logging
 
 def _parse_event_summary(summary: str):
     import re
@@ -71,7 +67,7 @@ def setup_embedder():
     except Exception:
         # 如果无法加载嵌入器，则使用模拟嵌入器
         print("警告：无法加载句子转换器。使用模拟嵌入器。")
-        embedder = np.ones(3)
+        embedder = lambda texts: np.ones((len(texts), 3))
     return embedder
 
 # 3. 创建辩论场景配置
@@ -84,7 +80,7 @@ def create_debate_config():
         **helper_functions.get_package_classes(game_master_prefabs),
     }
     # 注册自定义辩论代理
-    prefabs["debate_advocate__Entity"] = DebateAdvocate
+    prefabs["debate_advocate__Entity"] = DebateAdvocate()
 
     # 定义辩论者实例
     instances = [
@@ -253,23 +249,23 @@ def main():
     print("\n辩论示例完成！")
 
 # 高级用法：自定义辩论代理
-@dataclasses.dataclass
 class DebateAdvocate(prefab_lib.Prefab):
     """具有特定推理模式的辩论倡导者的自定义预制件。"""
-    description: str = "一个用于正式辩论的自定义代理，可以根据指定的立场和主题进行辩论。"
-    position: str = "pro"
-    debate_topic: str = ""
+    description = "一个用于正式辩论的自定义代理，可以根据指定的立场和主题进行辩论。"
 
-    def build(
-        self,
-        model: language_model.LanguageModel,
-        memory_bank: basic_associative_memory.AssociativeMemoryBank,
-    ) -> entity_agent_with_logging.EntityAgentWithLogging:
+    def __init__(self, position="pro", debate_topic="", **kwargs):
+        super().__init__(**kwargs)
+        self.position = position
+        self.debate_topic = debate_topic
+
+    def build(self, model, memory_bank):
         """构建自定义辩论代理。"""
         from concordia.agents import entity_agent_with_logging
         from concordia.components import agent as agent_components
 
         name = self.params.get("name", "Debater")
+        position = self.params.get("position", "pro")
+        debate_topic = self.params.get("debate_topic", "")
 
         # 创建组件
         memory = agent_components.memory.AssociativeMemory(memory_bank=memory_bank)
@@ -277,7 +273,7 @@ class DebateAdvocate(prefab_lib.Prefab):
             agent_name=name,
             instructions=(
                 f"您正在参加一场正式辩论。"
-                f"立场：{self.position}；主题：{self.debate_topic}。"
+                f"立场：{position}；主题：{debate_topic}。"
                 f"必须采用针锋相对的辩论风格："
                 f"1) 直接针对对方上一轮的关键论点进行反驳，指出漏洞、矛盾或证据不足；"
                 f"2) 给出清晰的主张（Claim）、证据（Evidence）与推理（Warrant），避免空泛表态；"
@@ -315,7 +311,7 @@ def create_advanced_debate_config():
         **helper_functions.get_package_classes(entity_prefabs),
         **helper_functions.get_package_classes(game_master_prefabs),
     }
-    prefabs["debate_advocate__Entity"] = DebateAdvocate
+    prefabs["debate_advocate__Entity"] = DebateAdvocate()
 
     # 定义高级辩论者实例
     instances = [
