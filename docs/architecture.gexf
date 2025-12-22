@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2025-12-22">
+    <creator>NetworkX 3.5</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="5" title="relation" type="string" />
+      <attribute id="6" title="networkx_key" type="long" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="name" type="string" />
+      <attribute id="1" title="layer" type="string" />
+      <attribute id="2" title="type" type="string" />
+      <attribute id="3" title="module" type="string" />
+      <attribute id="4" title="desc" type="string" />
+    </attributes>
+    <nodes>
+      <node id="llm_providers" label="llm_providers">
+        <attvalues>
+          <attvalue for="0" value="LLM 提供商适配层" />
+          <attvalue for="1" value="顶层" />
+          <attvalue for="2" value="适配器集合" />
+          <attvalue for="3" value="concordia/contrib/language_models/*" />
+          <attvalue for="4" value="OpenAI、Google、Amazon、HuggingFace、Mistral、Ollama、Together、VLLM 等统一封装" />
+        </attvalues>
+      </node>
+      <node id="embedder" label="embedder">
+        <attvalues>
+          <attvalue for="0" value="Sentence Embedder" />
+          <attvalue for="1" value="顶层" />
+          <attvalue for="2" value="函数/服务" />
+          <attvalue for="3" value="user-provided callable" />
+          <attvalue for="4" value="用于关联记忆的句向量嵌入函数" />
+        </attvalues>
+      </node>
+      <node id="simulation" label="simulation">
+        <attvalues>
+          <attvalue for="0" value="Simulation" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="核心编排" />
+          <attvalue for="3" value="concordia/prefabs/simulation/generic.py" />
+          <attvalue for="4" value="初始化实体与 GM、运行引擎循环、生成日志与检查点" />
+        </attvalues>
+      </node>
+      <node id="engines" label="engines">
+        <attvalues>
+          <attvalue for="0" value="Engines" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="执行引擎" />
+          <attvalue for="3" value="concordia/environment/engines/*" />
+          <attvalue for="4" value="Sequential/Simultaneous/Questionnaire 等时间与执行流控制" />
+        </attvalues>
+      </node>
+      <node id="entities" label="entities">
+        <attvalues>
+          <attvalue for="0" value="Entities" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="参与者" />
+          <attvalue for="3" value="concordia/agents/*" />
+          <attvalue for="4" value="能够观察世界与采取动作的主体（带组件与日志）" />
+        </attvalues>
+      </node>
+      <node id="game_masters" label="game_masters">
+        <attvalues>
+          <attvalue for="0" value="Game Masters" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="环境协调者" />
+          <attvalue for="3" value="concordia/components/game_master/*" />
+          <attvalue for="4" value="负责生成观察、定义动作规格、决定下一行动者与解析事件" />
+        </attvalues>
+      </node>
+      <node id="agent_components" label="agent_components">
+        <attvalues>
+          <attvalue for="0" value="Agent Components" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="组件集合" />
+          <attvalue for="3" value="concordia/components/agent/*" />
+          <attvalue for="4" value="记忆、指令、观察、计划、拼接行动等可组合的上下文组件" />
+        </attvalues>
+      </node>
+      <node id="prefabs" label="prefabs">
+        <attvalues>
+          <attvalue for="0" value="Prefabs" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="构建配方" />
+          <attvalue for="3" value="concordia/prefabs/*" />
+          <attvalue for="4" value="可复用的实体/GM/仿真配方（basic、dialogic、marketplace 等）" />
+        </attvalues>
+      </node>
+      <node id="language_model_base" label="language_model_base">
+        <attvalues>
+          <attvalue for="0" value="LanguageModel 基类" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="抽象接口" />
+          <attvalue for="3" value="concordia/language_model/language_model.py" />
+          <attvalue for="4" value="统一采样接口（sample_text、sample_choice），供适配层实现" />
+        </attvalues>
+      </node>
+      <node id="assoc_memory" label="assoc_memory">
+        <attvalues>
+          <attvalue for="0" value="AssociativeMemoryBank" />
+          <attvalue for="1" value="底层" />
+          <attvalue for="2" value="内存存储" />
+          <attvalue for="3" value="concordia/associative_memory/basic_associative_memory.py" />
+          <attvalue for="4" value="基于嵌入的记忆存取，GM 共享一个内存库，实体各自持有" />
+        </attvalues>
+      </node>
+      <node id="typing" label="typing">
+        <attvalues>
+          <attvalue for="0" value="Typing" />
+          <attvalue for="1" value="底层" />
+          <attvalue for="2" value="类型与协议" />
+          <attvalue for="3" value="concordia/typing/*" />
+          <attvalue for="4" value="Prefab/Entity/Scene/Simulation 等类型定义与协议约束" />
+        </attvalues>
+      </node>
+      <node id="utils" label="utils">
+        <attvalues>
+          <attvalue for="0" value="Utils" />
+          <attvalue for="1" value="底层" />
+          <attvalue for="2" value="工具集合" />
+          <attvalue for="3" value="concordia/utils/*" />
+          <attvalue for="4" value="并发、HTML、JSON、采样、绘图等通用工具" />
+        </attvalues>
+      </node>
+      <node id="component_instructions" label="component_instructions">
+        <attvalues>
+          <attvalue for="0" value="Instructions" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="行为指令组件" />
+          <attvalue for="3" value="concordia/components/agent/instructions.py" />
+          <attvalue for="4" value="为代理提供角色扮演的默认指令，定义代理应该如何表现" />
+        </attvalues>
+      </node>
+      <node id="component_memory" label="component_memory">
+        <attvalues>
+          <attvalue for="0" value="Memory" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="记忆组件" />
+          <attvalue for="3" value="concordia/components/agent/memory.py" />
+          <attvalue for="4" value="由记忆库支持的组件，用于存储和检索代理的经验" />
+        </attvalues>
+      </node>
+      <node id="component_observation" label="component_observation">
+        <attvalues>
+          <attvalue for="0" value="Observation" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="观察组件" />
+          <attvalue for="3" value="concordia/components/agent/observation.py" />
+          <attvalue for="4" value="接收和处理代理观察到的信息，将其添加到记忆中" />
+        </attvalues>
+      </node>
+      <node id="component_all_similar_memories" label="component_all_similar_memories">
+        <attvalues>
+          <attvalue for="0" value="All Similar Memories" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="相似记忆检索组件" />
+          <attvalue for="3" value="concordia/components/agent/all_similar_memories.py" />
+          <attvalue for="4" value="检索与当前情境相似的记忆，帮助代理做出决策" />
+        </attvalues>
+      </node>
+      <node id="component_concat_act" label="component_concat_act">
+        <attvalues>
+          <attvalue for="0" value="Concat Act Component" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="行动拼接组件" />
+          <attvalue for="3" value="concordia/components/agent/concat_act_component.py" />
+          <attvalue for="4" value="将来自不同上下文组件的信息拼接起来，生成代理的行动" />
+        </attvalues>
+      </node>
+      <node id="component_constant" label="component_constant">
+        <attvalues>
+          <attvalue for="0" value="Constant" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="常量组件" />
+          <attvalue for="3" value="concordia/components/agent/constant.py" />
+          <attvalue for="4" value="返回固定值的简单组件，用于提供不变的上下文信息" />
+        </attvalues>
+      </node>
+      <node id="component_plan" label="component_plan">
+        <attvalues>
+          <attvalue for="0" value="Plan" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="计划组件" />
+          <attvalue for="3" value="concordia/components/agent/plan.py" />
+          <attvalue for="4" value="帮助代理制定和跟踪长期计划的组件" />
+        </attvalues>
+      </node>
+      <node id="component_question_of_recent_memories" label="component_question_of_recent_memories">
+        <attvalues>
+          <attvalue for="0" value="Question of Recent Memories" />
+          <attvalue for="1" value="中层" />
+          <attvalue for="2" value="近期记忆问题组件" />
+          <attvalue for="3" value="concordia/components/agent/question_of_recent_memories.py" />
+          <attvalue for="4" value="基于最近记忆提出问题并回答，增强代理的反思能力" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="llm_providers" target="language_model_base" id="0">
+        <attvalues>
+          <attvalue for="5" value="implement" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="engines" id="1">
+        <attvalues>
+          <attvalue for="5" value="uses" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="game_masters" id="2">
+        <attvalues>
+          <attvalue for="5" value="instantiates" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="entities" id="3">
+        <attvalues>
+          <attvalue for="5" value="instantiates" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="assoc_memory" id="4">
+        <attvalues>
+          <attvalue for="5" value="creates_for_gm" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="typing" id="5">
+        <attvalues>
+          <attvalue for="5" value="depend" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="simulation" target="utils" id="6">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="engines" target="game_masters" id="7">
+        <attvalues>
+          <attvalue for="5" value="query_components" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="engines" target="typing" id="8">
+        <attvalues>
+          <attvalue for="5" value="depend" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="engines" target="utils" id="9">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="entities" target="game_masters" id="10">
+        <attvalues>
+          <attvalue for="5" value="act_to" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="entities" target="agent_components" id="11">
+        <attvalues>
+          <attvalue for="5" value="compose" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="entities" target="language_model_base" id="12">
+        <attvalues>
+          <attvalue for="5" value="call" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="entities" target="assoc_memory" id="13">
+        <attvalues>
+          <attvalue for="5" value="own" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="entities" target="typing" id="14">
+        <attvalues>
+          <attvalue for="5" value="depend" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="game_masters" target="entities" id="15">
+        <attvalues>
+          <attvalue for="5" value="make_observation_for" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="game_masters" target="assoc_memory" id="16">
+        <attvalues>
+          <attvalue for="5" value="share" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="game_masters" target="typing" id="17">
+        <attvalues>
+          <attvalue for="5" value="depend" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_instructions" id="18">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_memory" id="19">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_observation" id="20">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_all_similar_memories" id="21">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_concat_act" id="22">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_constant" id="23">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_plan" id="24">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="agent_components" target="component_question_of_recent_memories" id="25">
+        <attvalues>
+          <attvalue for="5" value="contains" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="prefabs" target="entities" id="26">
+        <attvalues>
+          <attvalue for="5" value="build" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="prefabs" target="game_masters" id="27">
+        <attvalues>
+          <attvalue for="5" value="build" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="assoc_memory" target="embedder" id="28">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_instructions" target="language_model_base" id="29">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_memory" target="assoc_memory" id="30">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_observation" target="component_memory" id="31">
+        <attvalues>
+          <attvalue for="5" value="add_to" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_all_similar_memories" target="language_model_base" id="32">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_all_similar_memories" target="component_memory" id="33">
+        <attvalues>
+          <attvalue for="5" value="retrieve_from" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_concat_act" target="language_model_base" id="34">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+      <edge source="component_question_of_recent_memories" target="language_model_base" id="35">
+        <attvalues>
+          <attvalue for="5" value="use" />
+          <attvalue for="6" value="0" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

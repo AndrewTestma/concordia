@@ -314,19 +314,19 @@ class DebateAdvocate(prefab_lib.Prefab):
         )
 
         components = {
-            agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY: memory,
-            "Instructions": instructions,
-            agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY: observation,
-            "SimilarMemories": similar_memories,
+          "Instructions": instructions,
+          agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY: memory,
+          agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY: observation,
+          "SimilarMemories": similar_memories,
         }
 
         act_component = agent_components.concat_act_component.ConcatActComponent(
             model=MODEL_REGISTRY.get(model_key) if model_key and MODEL_REGISTRY.get(model_key) else model,
             component_order=[
-                agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
-                agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY,
-                "SimilarMemories",
-                "Instructions",
+              "Instructions",
+              agent_components.memory.DEFAULT_MEMORY_COMPONENT_KEY,
+              agent_components.observation.DEFAULT_OBSERVATION_COMPONENT_KEY,
+              "SimilarMemories",
             ],
         )
 
