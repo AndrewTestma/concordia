@@ -1,0 +1,12 @@
+absl-py
+docstring-parser
+immutabledict
+ipython
+matplotlib
+ml-collections
+numpy>=1.26
+pandas
+python-dateutil
+reactivex
+tenacity
+termcolor
