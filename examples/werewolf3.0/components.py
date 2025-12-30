@@ -212,11 +212,16 @@ class CognitionCardComponent(action_spec_ignored.ActionSpecIgnored):
             "inner_thought_process": {
                 "observation_analysis": "游戏刚开始，正在观察。",
                 "self_reflection": "保持警惕。",
-                "emotional_state": "Calm"
+                "emotional_state": "Calm",
+                "hypotheses_about_death": "尚未建立假设",
+                "pressure_plan": "避免划水，提出质询"
             },
             "active_strategy": {
-                "current_plan": "Observe",
-                "tactical_steps": ["Listen to others", "Don't reveal too much"]
+                "current_plan": "试探性发言",
+                "tactical_steps": ["分析死者出局影响", "对后续发言者施压，要求输出干货", "观察谁在复读‘听发言’"],
+                "speech_style": "逻辑分析型",
+                "anti_silence_rules": ["禁止只说‘听发言’", "必须给出至少一个假设或问题", "点名至少一位需要回应的玩家"],
+                "question_targets": []
             }
         }
 
@@ -249,8 +254,31 @@ class CognitionCardComponent(action_spec_ignored.ActionSpecIgnored):
         1. Perceive & Analyze (Update inner_thought_process)
         2. Card Refresh (Update active_strategy)
         """
-        # 0. Sync facts (Simplified: assume context contains necessary info or update manually)
-        # In a real implementation, we would extract specific facts from memory here.
+        # 0. Sync facts
+        # Parse Night Results from context (Private Message)
+        # Format: [PRIVATE] 你查验了 {target}。他是 {is_good}。
+        night_result_match = re.search(r"\[PRIVATE\].*?查验了 (.*?)。他是 (.*?)。", context)
+        if night_result_match:
+            target, identity = night_result_match.groups()
+            self._card["critical_facts"]["night_results"] = f"查验了 {target}，身份是 {identity}"
+
+        # Parse Death from context (Broadcast)
+        # Format: [BROADCAST] 昨晚，{target} 死了。
+        death_match = re.search(r"\[BROADCAST\].*?昨晚，(.*?) 死了。", context)
+        if death_match:
+            dead_player = death_match.group(1)
+            self._card["critical_facts"]["death_toll"] = f"{dead_player} 死亡"
+
+        # Detect passive patterns in context to trigger anti-silence mode
+        passive_patterns = ["没有明确信息", "暂时没有信息", "继续听大家发言", "听发言"]
+        if any(pat in context for pat in passive_patterns):
+            self._card["active_strategy"]["current_plan"] = "主动试探并施压"
+            self._card["active_strategy"]["speech_style"] = "猎人施压型"
+            self._card["active_strategy"]["tactical_steps"] = [
+                "分析首夜死亡可能原因并提出至少一个假设",
+                "对后续发言者提出具体问题",
+                "标记复读‘听发言’的玩家为可疑"
+            ]
 
         chain = interactive_document.InteractiveDocument(self._model)
         chain.statement(f"背景信息:\n{context}")
@@ -259,19 +287,23 @@ class CognitionCardComponent(action_spec_ignored.ActionSpecIgnored):
         # Step 1: Perceive & Analyze
         chain.statement("任务 1: 感知与评估 (Perceive & Analyze)")
         chain.statement("请结合你的人设和已知事实，分析刚才这段发言对局势的影响，并更新你的认知卡中的 'inner_thought_process' 部分。")
-        chain.statement("特别是：\n1. observation_analysis: 分析场上局势和其他玩家的潜在身份。\n2. self_reflection: 反思自己的处境和伪装程度。\n3. emotional_state: 当前情绪。")
+        chain.statement("必须包含字段：observation_analysis、self_reflection、emotional_state、hypotheses_about_death。请给出至少一个关于死者的假设。")
 
         inner_thought_json = chain.open_question(
-            "请以 JSON 格式返回更新后的 inner_thought_process:",
+            "请以 JSON 格式返回更新后的 inner_thought_process（包含 hypotheses_about_death）:",
             max_tokens=600
         )
         self._update_card_section("inner_thought_process", inner_thought_json)
 
         # Step 2: Card Refresh
-        # We start a new chain or continue? Continuing is better for context.
         chain.statement(f"更新后的思考:\n{json.dumps(self._card['inner_thought_process'], ensure_ascii=False, indent=2)}")
         chain.statement("任务 2: 策略更新 (Card Refresh)")
-        chain.statement("基于最新的思考，调整你的策略 'active_strategy'。")
+        chain.statement("基于最新的思考，调整你的策略 'active_strategy'。必须包含字段：current_plan、tactical_steps、speech_style、anti_silence_rules、question_targets。")
+
+        # Special Instruction for Seer
+        if self._role_component.get_role() == "预言家" and "查验" in self._card["critical_facts"].get("night_results", ""):
+             chain.statement("!!! 重要提示 !!! 你是预言家且已经有了查验结果。为了好人阵营的胜利，你的策略必须包括：尽快在发言中明确报出查验结果，不要隐瞒！")
+
         chain.statement("之前的策略还适用吗？如果不适用，该转为什么策略？(例如: 潜伏、带节奏、跳身份、抗推别人)")
 
         strategy_json = chain.open_question(
@@ -286,15 +318,31 @@ class CognitionCardComponent(action_spec_ignored.ActionSpecIgnored):
         """
         chain = interactive_document.InteractiveDocument(self._model)
         # Force the full card as System Prompt / Context
-        chain.statement(f"你现在的完整认知卡:\n```json\n{json.dumps(self._card, ensure_ascii=False, indent=2)}\n```")
+        card_json = json.dumps(self._card, ensure_ascii=False, indent=2)
+        chain.statement(f"你现在的完整认知卡:\n```json\n{card_json}\n```")
         chain.statement(f"当前对话:\n{context}")
 
         chain.statement("任务 3: 执行输出 (Execute Speech)")
         chain.statement("请根据你当前的状态卡（包含人设、最新思考和策略），生成你这一轮的公开发言。")
-        chain.statement("确保你的语气符合人设，逻辑符合策略。如果你的策略是伪装，不要暴露真实意图。")
+        chain.statement("确保你的语气符合人设，逻辑符合策略。禁止只说‘听发言’或‘没有信息’，必须：1) 给出至少一个关于昨夜死亡的假设；2) 提出至少一个针对具体玩家的问题；3) 表达对‘划水’行为的明确态度。")
+
+        # Enforce Seer Reveal
+        if self._role_component.get_role() == "预言家" and "查验" in self._card["critical_facts"].get("night_results", ""):
+            chain.statement("!!! 警告 !!! 你是预言家，你必须直接、明确地报出你的查验信息（谁是金水/好人，谁是查杀/狼人）。不要含糊其辞！")
+        elif self._role_component.get_role() == "狼人":
+             chain.statement("如果你是狼人，请伪装成好人。")
 
         speech = chain.open_question(
             "请生成发言内容 (直接输出内容，不需要JSON):",
             max_tokens=600
         )
+
+        # Output to terminal as requested: Card -> Thoughts -> Speech
+        print(f"\n[{self._player_name} 的思考过程]")
+        print("-" * 30)
+        print(f"1. 认知卡 (Cognition Card):\n{card_json}")
+        print(f"2. 思考 (Thoughts):\n{json.dumps(self._card['inner_thought_process'], ensure_ascii=False, indent=2)}")
+        print(f"3. 发言 (Speech):\n{speech}")
+        print("-" * 30 + "\n")
+
         return speech

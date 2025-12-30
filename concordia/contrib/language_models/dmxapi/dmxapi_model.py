@@ -87,9 +87,10 @@ class DMXApiLanguageModel(language_model.LanguageModel):
         'temperature': temperature,
         'max_tokens': max_tokens,
         'top_p': top_p,
+        'stream': True,
     }
-    if terminators:
-      payload['stop'] = list(terminators)
+    # if terminators:
+    #   payload['stop'] = list(terminators)
     if seed is not None:
       payload['seed'] = seed
     headers = {
@@ -112,6 +113,7 @@ class DMXApiLanguageModel(language_model.LanguageModel):
             data=json.dumps(payload),
             timeout=timeout,
             verify=False, # 忽略SSL证书验证错误
+            stream=True
         )
         resp.raise_for_status()
         break
@@ -132,57 +134,42 @@ class DMXApiLanguageModel(language_model.LanguageModel):
         raise language_model.InvalidResponseError(
             f'Request error calling {url}: {last_error_text}'
         )
-    content_type = resp.headers.get('Content-Type', '')
-    if 'application/json' not in content_type:
-      raise language_model.InvalidResponseError(
-          f'Invalid response type: {content_type}; body: {resp.text[:200]}'
-      )
-    try:
-      data = resp.json()
-    except Exception:
-      raise language_model.InvalidResponseError(
-          f'Invalid JSON response: {resp.text[:200]}'
-      )
-    choices = data.get('choices', [])
-    if not choices:
-      raise language_model.InvalidResponseError('No choices in response')
-    first = choices[0]
-    content = None
-    if isinstance(first, dict):
-      msg = first.get('message')
-      if isinstance(msg, dict):
-        c = msg.get('content')
-        if isinstance(c, str) and c.strip():
-          content = c
-      if content is None:
-        t = first.get('text')
-        if isinstance(t, str) and t.strip():
-          content = t
-      if content is None:
-        ot = first.get('output_text')
-        if isinstance(ot, str) and ot.strip():
-          content = ot
-    if not isinstance(content, str):
-      # Try deeper search for 'content' key in nested structures or just dump the structure
-      try:
-          if isinstance(first, dict):
-              # Check for delta (streaming-like structure sometimes returned in non-streaming)
-              if 'delta' in first and isinstance(first['delta'], dict):
-                  content = first['delta'].get('content')
 
-              # If still None, maybe it is directly in the dict? (unlikely for standard OpenAI format but possible for others)
-              if content is None:
-                   content = first.get('content')
-      except Exception:
-          pass
+    # 处理流式响应
+    full_content = ""
+    buffer = ""
+    for chunk in resp.iter_content(chunk_size=None):
+        if chunk:
+            buffer += chunk.decode("utf-8")
+            while "\n" in buffer:
+                line, buffer = buffer.split("\n", 1)
+                if line.strip() == "":
+                    continue
+                if line.startswith("data: "):
+                    data_line = line[len("data: ") :].strip()
+                    if data_line == "[DONE]":
+                        break
+                    else:
+                        try:
+                            data = json.loads(data_line)
+                            choices = data.get("choices", [])
+                            if choices:
+                                delta = choices[0].get("delta", {})
+                                content = delta.get("content", "")
+                                if content:  # 只有当内容不为空时才打印和添加
+                                    print(content, end="", flush=True)
+                                    full_content += content
+                        except json.JSONDecodeError:
+                            buffer = line + "\n" + buffer
+                            break
 
-    if not isinstance(content, str) or not content.strip():
-      # Log the full response for debugging purposes
-      print(f"DEBUG: DMXAPI Full Response: {json.dumps(data, ensure_ascii=False)}")
-      raise language_model.InvalidResponseError(
-          f'Invalid choices payload: {json.dumps(first, ensure_ascii=False)[:200]}'
-      )
-    return content
+    if not full_content.strip():
+        raise language_model.InvalidResponseError(
+            'No content received in streaming response'
+        )
+
+    print()  # 添加新行以完成打印
+    return full_content
 
   @override
   def sample_choice(
