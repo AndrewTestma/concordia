@@ -1,0 +1,13 @@
+# PDF处理相关依赖
+PyPDF2>=3.0.0
+
+# OCR相关依赖（可选，用于扫描版PDF）
+pdf2image>=1.16.3
+pytesseract>=0.3.10
+
+
+# 日志和系统依赖（Python标准库已包含）
+# logging, sys, os, io, tempfile 等为标准库，无需额外安装
+
+# 项目内部依赖（需要项目环境）
+# concordia.contrib.language_models.dmxapi.dmxapi_model
