@@ -1,0 +1,104 @@
+meta:
+  id: "case_002_xiangyang"
+  name: "向阳山案件调查"
+  version: "1.0"
+  description: "根据《向阳山案件调查规则说明文档》改编。三位各怀秘密的调查员齐聚向阳村，试图揭开尘封的真相。"
+
+knowledge_config:
+  dataset_id: "xiangyang-dataset-uuid"
+  tag_strategy: "match_tag"
+
+visual_style:
+  base_prompt: "Cinematic, Rural China Mystery, gloomy atmosphere, 2000s style, realistic, 8k, detailed background, foggy mountains"
+  negative_prompt: "cartoon, anime, bright colors, happy, modern city, sci-fi, bad quality, blurry"
+
+  character_appearance:
+    ren_zhiyao: "A 30-year-old male police officer, serious face, wearing casual jacket, looking tired, short hair"
+    ding_yumeng: "A 20-year-old village girl, simple rural clothes, innocent looking but slightly strange expression, messy hair"
+    jiang_yuhuan: "A 25-year-old male, sharp look, plastic surgery face features, fashionable clothes, looking suspicious"
+
+  scene_appearance:
+    village_entrance: "Old village entrance, stone tablet with 'Xiangyang Village', foggy, mountains in background"
+    police_station: "Small rural police station office, wooden desk, old files, dim light, cigarette smoke"
+    mountain_road: "Muddy mountain road, dense forest, dark shadows, scary atmosphere"
+
+characters:
+  - id: "ren_zhiyao"
+    name: "任志遥"
+    profile: "警官。实际上是死者张峻涛的儿子。对外宣称是张峻涛的远房叔叔，来找遗产。"
+    private_knowledge_tag: "任志遥"
+    objectives:
+      - "找出父亲张峻涛的真正死因"
+      - "隐藏自己将尸骨移到大路上并伪造现场的行为（避免停职）"
+      - "如果被问红绳，说是为了找叔叔遗产"
+
+  - id: "ding_yumeng"
+    name: "丁雨蒙"
+    profile: "村支书丁晟的女儿。协助警方调查。村民认为她脑子有点问题。"
+    private_knowledge_tag: "丁雨蒙"
+    objectives:
+      - "协助警方调查，但要保护父亲丁晟"
+      - "隐瞒自己曾将指尖当鱼饵丢进水库的事"
+      - "如果有人怀疑父亲，编造理由圆场"
+
+  - id: "jiang_yuhuan"
+    name: "姜宇恒"
+    profile: "警官。小时候在向阳村生活过（小恒），但整容了，没人认得出。目的是立功升官。"
+    private_knowledge_tag: "姜宇桓"
+    objectives:
+      - "调查无名尸骨案，争取立功"
+      - "隐瞒沈秋死亡当天自己看到的事"
+      - "隐瞒袭击张峻涛的事"
+      - "如果丁雨蒙认出，坚决否认是小恒"
+
+phases:
+  - id: "p1_intro"
+    type: "SEQUENTIAL_SPEAK"
+    label: "自我介绍"
+    scene: "police_station"
+    instruction: "请进行简单的自我介绍（姓名、来向阳山的目的），切记不要透露过多个人秘密。"
+    next_phase: "p2_share_legends"
+
+  - id: "p2_share_legends"
+    type: "SEQUENTIAL_SPEAK"
+    label: "分享传说"
+    scene: "police_station"
+    instruction: "请按 丁雨蒙 -> 任志遥 -> 姜宇恒 的顺序，分享你们知道的向阳村传说。"
+    next_phase: "p3_share_case"
+
+  - id: "p3_share_case"
+    type: "SEQUENTIAL_SPEAK"
+    label: "分享案件信息"
+    scene: "police_station"
+    instruction: "请分享你们手头的案件信息（含个人物品信息），这是公开信息。"
+    next_phase: "p4_public_discuss"
+
+  - id: "p4_public_discuss"
+    type: "FREE_DISCUSSION"
+    label: "公开讨论"
+    scene: "police_station"
+    duration_turns: 10
+    instruction: "现在进行自由讨论。请根据传说和案件信息，尝试梳理人物关系和时间线。"
+    default_next: "p5_share_clues"
+
+  - id: "p5_share_clues"
+    type: "SEQUENTIAL_SPEAK"
+    label: "分享走访线索"
+    scene: "police_station"
+    instruction: "请分享你们的走访线索（警局笔录、地图等），这是公开线索，不得隐藏。"
+    next_phase: "p6_restore_truth"
+
+  - id: "p6_restore_truth"
+    type: "FREE_DISCUSSION"
+    label: "还原真相"
+    scene: "police_station"
+    duration_turns: 15
+    instruction: "请结合所有线索，还原三起案件的真相，找出真凶（或确认是否自杀）。"
+    default_next: "p7_conclusion"
+
+  - id: "p7_conclusion"
+    type: "SEQUENTIAL_SPEAK"
+    label: "结案陈词"
+    scene: "police_station"
+    instruction: "请分别陈述你们的最终结论：谁是凶手？动机是什么？"
+    next_phase: null
