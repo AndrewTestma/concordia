@@ -4,44 +4,6 @@
 
 ---
 
-## 安装说明
-
-### 快速安装
-
-1. **安装Python依赖**
-```bash
-# 使用清华源加速安装
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-2. **OCR支持（可选）**
-如果需要处理扫描版PDF，请额外安装：
-
-**Windows系统：**
-- Tesseract-OCR: https://github.com/UB-Mannheim/tesseract/wiki 下载并安装
-- Poppler: https://github.com/oschwartz10612/poppler-windows/releases/ 下载并解压，将poppler/bin添加到系统PATH
-- 中文语言包：安装tesseract时勾选中文语言包
-
-**Ubuntu系统：**
-```bash
-sudo apt-get install tesseract-ocr tesseract-ocr-chi-sim poppler-utils
-```
-
-3. **环境变量配置**
-```bash
-# 设置DMXAPI相关环境变量
-export DMXAPI_KEY="your_api_key_here"
-export DMXAPI_BASE_URL="https://www.dmxapi.com"
-```
-
-### 依赖说明
-- **PyPDF2**: 处理文本型PDF文件
-- **pdf2image + pytesseract**: 处理扫描版PDF（OCR）
-- **openai**: 调用LLM API进行文本处理
-- **concordia**: 项目内部模块，需要正确配置项目路径
-
----
-
 ### 第一阶段：准备工作 (工具链)
 
 你需要以下工具：
