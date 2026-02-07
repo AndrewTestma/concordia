@@ -1,0 +1,61 @@
+meta:
+  id: "case_001_demo"
+  name: "午夜侦探"
+  version: "2.0"
+  description: "一个简单的测试剧本，用于验证自动化引擎的各项功能。"
+
+knowledge_config:
+  dataset_id: "test-dataset-001"
+  tag_strategy: "prefix_match"
+
+visual_style:
+  base_prompt: "Cinematic, Film Noir, 1940s detective movie style, high contrast, volumetric lighting, 8k, masterpiece"
+  negative_prompt: "cartoon, anime, low quality, blurry, text, watermark, bad anatomy, modern objects"
+  
+  character_appearance:
+    char_detective: "A 35-year-old male detective, trench coat, fedora hat, smoking a cigarette, sharp eyes, stubble"
+    char_suspect: "A 25-year-old woman, red dress, elegant, nervous expression, pearl necklace"
+  
+  scene_appearance:
+    office: "A messy detective office, files scattered on desk, dim light coming from window blinds, smoke in the air"
+    interrogation_room: "Cold concrete room, single metal table, bright overhead lamp, dark shadows"
+
+characters:
+  - id: "char_detective"
+    name: "李探长"
+    profile: "资深侦探，经验丰富但有些愤世嫉俗。正在调查一起珠宝失窃案。"
+    private_knowledge_tag: "【李探长专属】"
+    objectives:
+      - "查出珠宝的下落"
+      - "判断嫌疑人是否在撒谎"
+  
+  - id: "char_suspect"
+    name: "苏小姐"
+    profile: "年轻的社交名媛，据说最后一次见到失窃珠宝就是在她手里。看起来很无辜，但似乎隐瞒了什么。"
+    private_knowledge_tag: "【苏小姐专属】"
+    objectives:
+      - "洗清自己的嫌疑"
+      - "隐瞒自己欠下赌债的事实"
+
+phases:
+  - id: "phase_1_intro"
+    type: "SEQUENTIAL_SPEAK"
+    label: "初次交锋"
+    scene: "office"
+    instruction: "李探长首先质问苏小姐为何昨晚出现在案发现场。苏小姐进行辩解。"
+    next_phase: "phase_2_investigation"
+
+  - id: "phase_2_investigation"
+    type: "FREE_DISCUSSION"
+    label: "深入盘问"
+    scene: "interrogation_room"
+    duration_turns: 10
+    instruction: "双方自由讨论，李探长试图找出苏小姐证词中的漏洞。"
+    default_next: "phase_3_conclusion"
+    
+  - id: "phase_3_conclusion"
+    type: "SEQUENTIAL_SPEAK"
+    label: "结案陈词"
+    scene: "office"
+    instruction: "李探长总结案情，给出结论。"
+    next_phase: null

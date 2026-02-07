@@ -286,8 +286,8 @@ ID: {role_name}_Public_001
 def main():
     role = "任志遥"
     # PDF 文件路径
-    input_file = os.path.join(os.path.dirname(__file__), f"{role}走访线索.pdf")
-    output_file = os.path.join(os.path.dirname(__file__), f"{role}_走访线索.md")
+    input_file = os.path.join(os.path.dirname(__file__), f"{role}结案报告.pdf")
+    output_file = os.path.join(os.path.dirname(__file__), f"{role}_结案报告.md")
 
     if not os.path.exists(input_file):
         logger.error(f"输入文件不存在: {input_file}")

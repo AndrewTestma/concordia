@@ -1,0 +1,15 @@
+# Dify Configuration
+# 请填入你的 Dify 应用配置信息
+
+dify:
+  base_url: "http://117.50.34.101/v1"
+
+  # 玩家推理器 App (Player Reasoner)
+  player_api_key: "app-Lzcx2fNIYvV9acXy1bunbcpM"
+
+  # 导演工作室 App (Director Studio)
+  director_api_key: "YOUR_DIRECTOR_APP_KEY"
+
+# 系统配置
+system:
+  log_level: "INFO"
